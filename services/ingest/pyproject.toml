@@ -1,0 +1,21 @@
+[project]
+name = "kalshidive-ingest"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "kalshidive-schemas",
+    "kalshidive-bus",
+    "websockets>=13.0",
+    "asyncpg>=0.29",
+    "cryptography>=42.0",
+]
+
+[project.scripts]
+kalshidive-ingest = "kalshidive_ingest.main:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["kalshidive_ingest"]
