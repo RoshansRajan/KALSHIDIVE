@@ -1,0 +1,20 @@
+[project]
+name = "kalshidive-analysis"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "kalshidive-schemas",
+    "kalshidive-bus",
+    "kalshidive-ingest",
+    "anthropic>=0.40",
+]
+
+[project.scripts]
+kalshidive-analysis = "kalshidive_analysis.main:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["kalshidive_analysis"]
