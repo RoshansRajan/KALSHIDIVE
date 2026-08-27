@@ -1,0 +1,26 @@
+# Secrets -- the private key must never be committed.
+.env
+*.pem
+# `secrets/*` rather than `secrets/`: git does not descend into an ignored
+# directory, so a directory-level ignore would make the negation below dead.
+secrets/*
+!secrets/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+dist/
+*.local
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/

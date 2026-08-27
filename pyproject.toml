@@ -1,0 +1,22 @@
+# Root config for tooling only. Each service and package has its own
+# pyproject.toml and is installed independently -- that is what lets the
+# ingest image ship without the Anthropic SDK and the analysis image ship
+# without the Kalshi crypto stack.
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [
+    "packages/schemas",
+    "packages/bus",
+    "services/ingest",
+    "services/analysis",
+]
+asyncio_mode = "auto"
+filterwarnings = ["error::DeprecationWarning"]
+
+[tool.ruff]
+line-length = 90
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
