@@ -1,0 +1,96 @@
+/* Dark by default: this is a screen meant to sit open on a second monitor,
+   and a bright panel in peripheral vision is genuinely tiring. */
+
+:root {
+  --bg: #0b0e14;
+  --panel: #131722;
+  --border: #222836;
+  --text: #d7dce5;
+  --muted: #7c869b;
+  --bid: #22c55e;
+  --ask: #ef4444;
+  --accent: #60a5fa;
+  --warn: #f59e0b;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.app { padding: 20px; max-width: 1400px; margin: 0 auto; }
+
+.app__head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px;
+}
+.app__head h1 { margin: 0; font-size: 18px; letter-spacing: 0.08em; }
+.app__status { color: var(--muted); font-size: 12px; display: flex; align-items: center; gap: 8px; }
+
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.dot--live { background: var(--bid); box-shadow: 0 0 8px var(--bid); }
+.dot--down { background: var(--warn); }
+
+.app__empty { color: var(--muted); line-height: 1.7; max-width: 60ch; }
+.app__empty code { color: var(--accent); }
+
+.app__grid {
+  display: grid; gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+}
+
+/* `min-width: 0` on every grid/flex child that holds sizeable content.
+   Grid and flex items default to `min-width: auto`, which refuses to shrink
+   below the intrinsic width of their contents -- so a wide number in the
+   depth ladder pushes the whole card past its track instead of the text
+   truncating. This is the single most common cause of a grid that overflows
+   its container. */
+.market {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 8px; padding: 16px; min-width: 0;
+}
+.market__head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.market__head h2 {
+  margin: 0; font-size: 13px; color: var(--accent); letter-spacing: 0.04em;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.badge { font-size: 10px; padding: 2px 7px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.08em; }
+.badge--stale { background: rgba(245, 158, 11, 0.15); color: var(--warn); border: 1px solid rgba(245, 158, 11, 0.35); }
+
+.market__top { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.quote { display: flex; flex-direction: column; gap: 2px; padding: 8px; background: rgba(255,255,255,0.02); border-radius: 5px; min-width: 0; }
+.quote__label { font-size: 9px; color: var(--muted); letter-spacing: 0.1em; }
+.quote__price { font-size: 20px; font-variant-numeric: tabular-nums; }
+.quote__size { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.quote--bid .quote__price { color: var(--bid); }
+.quote--ask .quote__price { color: var(--ask); }
+
+.market__books { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; min-width: 0; }
+
+.depth { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.depth__empty { color: var(--muted); font-size: 11px; padding: 4px; }
+.depth__row { position: relative; display: flex; justify-content: space-between; padding: 3px 6px; font-size: 12px; font-variant-numeric: tabular-nums; }
+.depth__bar { position: absolute; inset: 0 auto 0 0; opacity: 0.16; border-radius: 3px; }
+.depth--bid .depth__bar { background: var(--bid); }
+.depth--ask .depth__bar { background: var(--ask); }
+.depth__price { position: relative; }
+.depth--bid .depth__price { color: var(--bid); }
+.depth--ask .depth__price { color: var(--ask); }
+.depth__size { position: relative; color: var(--muted); padding-left: 8px; }
+
+.insight { border-top: 1px solid var(--border); padding-top: 12px; }
+.insight--empty { color: var(--muted); font-size: 12px; font-style: italic; }
+.insight__head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.insight__signal { font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; }
+.insight--bullish .insight__signal { color: var(--bid); }
+.insight--bearish .insight__signal { color: var(--ask); }
+.insight--neutral .insight__signal { color: var(--muted); }
+.insight__conf, .insight__horizon { font-size: 11px; color: var(--muted); }
+.insight__rationale { margin: 0 0 6px; font-size: 12px; line-height: 1.6; }
+.insight__meta { font-size: 10px; color: var(--muted); }
