@@ -1,0 +1,77 @@
+# Local development stack. Mirrors the production topology in DEPLOY.md:
+# Postgres stands in for RDS, and the two Python services map one-to-one onto
+# the ECS services described there.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: kalshi
+      POSTGRES_PASSWORD: kalshi
+      POSTGRES_DB: kalshidive
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Files here run once, on first init of an empty data volume.
+      - ./db/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kalshi -d kalshidive"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+
+  ingest:
+    build:
+      # Root context: the service needs packages/ as well as its own source.
+      context: .
+      dockerfile: services/ingest/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://kalshi:kalshi@postgres:5432/kalshidive
+      FANOUT_PORT: "8765"
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      # Unset by default -> MockFeed. Set both to stream live Kalshi data.
+      KALSHI_API_KEY_ID: ${KALSHI_API_KEY_ID:-}
+      KALSHI_PRIVATE_KEY_PATH: ${KALSHI_PRIVATE_KEY_PATH:-}
+      KALSHI_MARKET_TICKERS: ${KALSHI_MARKET_TICKERS:-}
+    ports:
+      - "8765:8765"
+    volumes:
+      - ./secrets:/secrets:ro
+
+  analysis:
+    build:
+      context: .
+      dockerfile: services/analysis/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://kalshi:kalshi@postgres:5432/kalshidive
+      FANOUT_URL: ws://ingest:8765
+      INSIGHT_FANOUT_PORT: "8766"
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-sonnet-5}
+      ANALYSIS_WINDOW_SECONDS: ${ANALYSIS_WINDOW_SECONDS:-30}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "8766:8766"
+
+  web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile
+    environment:
+      # Browser-side URLs, so these resolve from the host, not the compose network.
+      VITE_TICK_URL: ws://localhost:8765
+      VITE_INSIGHT_URL: ws://localhost:8766
+    ports:
+      - "5173:5173"
+    depends_on:
+      - ingest
+
+volumes:
+  pgdata:

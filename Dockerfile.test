@@ -1,0 +1,8 @@
+# Test image. Separate from the service images because tests need pytest and
+# the service images deliberately do not ship it.
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements-dev.txt .
+RUN pip install --no-cache-dir -r requirements-dev.txt
+COPY . .
+CMD ["python", "-m", "pytest", "-v"]
